@@ -46,6 +46,8 @@ FontDescriptor::FontDescriptor(Napi::Env env, Napi::Object obj) {
   path = NULL;
   postscriptName = getString(env, obj, "postscriptName");
   family = getString(env, obj, "family");
+  localizedName = getString(env, obj, "localizedName");
+  enName = getString(env, obj, "enName");
   style = getString(env, obj, "style");
   weight = (FontWeight) getNumber(env, obj, "weight");
   width = (FontWidth) getNumber(env, obj, "width");
