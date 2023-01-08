@@ -67,6 +67,24 @@ unsigned int getLocaleIndexByName(unsigned int *index, IDWriteLocalizedStrings *
   return 0;
 }
 
+unsigned int getLocaleIndexByName(IDWriteLocalizedStrings *strings, wchar_t* localeName) {
+  unsigned int index = 0;
+  BOOL exists = false;
+
+  // If the default locale is returned, find that locale name, otherwise use "en-us".
+  HR(strings->FindLocaleName(localeName, &index, &exists));
+
+  // if the above find did not find a match, retry with US English
+  if (!exists) {
+    HR(strings->FindLocaleName(L"en-us", &index, &exists));
+  }
+
+  if (!exists)
+    index = 0;
+
+  return index;
+}
+
 // gets a localized string for a font
 long getString(char **out, IDWriteFont *font, DWRITE_INFORMATIONAL_STRING_ID string_id, bool isLanguageSpecified = false, wchar_t* localeName = L"ja-jp") {
   *out = NULL;

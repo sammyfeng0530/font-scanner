@@ -28,6 +28,28 @@ NSString* getLocalizedAttribute(CTFontDescriptorRef ref, CFStringRef attr, CFStr
   return (NSString *) CTFontDescriptorCopyAttribute(ref, attr);
 }
 
+// get localized string
+NSString* CFStringToUtf8String(CFStringRef str)
+{
+  if(str == NULL){
+    return NULL;
+  }
+  CFIndex max = CFStringGetMaximumSizeForEncoding(CFStringGetLength(str), kCFStringEncodingUTF8) + 1;
+  char* buffer = (char*)malloc(max);
+  if (CFStringGetCString(str, buffer, max, kCFStringEncodingUTF8)) {
+      return [NSString stringWithUTF8String: buffer];;
+  }
+  free(buffer);
+  return NULL;
+}
+NSString* getLocalizedAttribute(CTFontDescriptorRef ref, CFStringRef attr, CFStringRef *localized) {
+  CFTypeRef value = CTFontDescriptorCopyLocalizedAttribute(ref, attr, localized);
+  if(value && (CFStringRef)value) {
+    return CFStringToUtf8String((CFStringRef)value);
+  }
+  return (NSString *) CTFontDescriptorCopyAttribute(ref, attr);
+}
+
 // converts a CoreText weight (-1 to +1) to a standard weight (100 to 900)
 static int convertWeight(float weight) {
   if (weight <= -0.8f)
