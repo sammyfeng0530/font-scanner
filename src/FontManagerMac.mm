@@ -59,7 +59,7 @@ static int convertWidth(float unit) {
   }
 }
 
-FontDescriptor *getMaybeFontDescriptor(const char *path, const char *postscriptName, const char *family, const char *style,
+FontDescriptor *getMaybeFontDescriptor(const char *path, const char *postscriptName, const char *family, const char *localizedName, const char *enName, const char *style,
   FontWeight weight, FontWidth width, bool italic, bool monospace) {
   if (path == NULL || postscriptName == NULL || family == NULL || style == NULL) {
     return NULL;
@@ -69,6 +69,8 @@ FontDescriptor *getMaybeFontDescriptor(const char *path, const char *postscriptN
     path,
     postscriptName,
     family,
+    localizedName,
+    enName,
     style,
     weight,
     width,
