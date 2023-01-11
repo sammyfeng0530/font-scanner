@@ -6,7 +6,7 @@
 #include "ResultSet.h"
 
 // get localized string
-NSString* CFStringToUtf8String(CFStringRef str)
+char* CFStringToUtf8String(CFStringRef str)
 {
   if(str == NULL){
     return NULL;
@@ -14,18 +14,22 @@ NSString* CFStringToUtf8String(CFStringRef str)
   CFIndex max = CFStringGetMaximumSizeForEncoding(CFStringGetLength(str), kCFStringEncodingUTF8) + 1;
   char* buffer = (char*)malloc(max);
   if (CFStringGetCString(str, buffer, max, kCFStringEncodingUTF8)) {
-      return [NSString stringWithUTF8String: buffer];;
+      return buffer;
   }
   free(buffer);
   return NULL;
 }
 
-NSString* getLocalizedAttribute(CTFontDescriptorRef ref, CFStringRef attr, CFStringRef *localized) {
+char* getStringAttribute(CTFontDescriptorRef ref, CFStringRef attr) {
+  return CFStringToUtf8String((CFStringRef)CTFontDescriptorCopyAttribute(ref, attr));
+}
+
+char* getLocalizedAttribute(CTFontDescriptorRef ref, CFStringRef attr, CFStringRef *localized) {
   CFTypeRef value = CTFontDescriptorCopyLocalizedAttribute(ref, attr, localized);
   if(value && (CFStringRef)value) {
     return CFStringToUtf8String((CFStringRef)value);
   }
-  return (NSString *) CTFontDescriptorCopyAttribute(ref, attr);
+  return getStringAttribute(ref, attr);
 }
 
 // converts a CoreText weight (-1 to +1) to a standard weight (100 to 900)
@@ -83,7 +87,7 @@ long createFontDescriptor(FontDescriptor **res, CTFontDescriptorRef descriptor) 
   NSURL *url = (NSURL *) CTFontDescriptorCopyAttribute(descriptor, kCTFontURLAttribute);
   NSString *psName = (NSString *) CTFontDescriptorCopyAttribute(descriptor, kCTFontNameAttribute);
   NSString *family = (NSString *) CTFontDescriptorCopyAttribute(descriptor, kCTFontFamilyNameAttribute);
-  NSString *localizedName = getLocalizedAttribute(descriptor, kCTFontFamilyNameAttribute, NULL);
+  char *localizedName = getLocalizedAttribute(descriptor, kCTFontFamilyNameAttribute, NULL);
   NSString *enName = (NSString *) CTFontDescriptorCopyAttribute(descriptor, kCTFontFamilyNameAttribute);
   NSString *style = (NSString *) CTFontDescriptorCopyAttribute(descriptor, kCTFontStyleNameAttribute);
 
@@ -101,7 +105,7 @@ long createFontDescriptor(FontDescriptor **res, CTFontDescriptorRef descriptor) 
     [[url path] UTF8String],
     [psName UTF8String],
     [family UTF8String],
-    [localizedName UTF8String],
+    localizedName,
     [enName UTF8String],
     [style UTF8String],
     weight,
@@ -113,7 +117,9 @@ long createFontDescriptor(FontDescriptor **res, CTFontDescriptorRef descriptor) 
   [url release];
   [psName release];
   [family release];
-  [localizedName release];
+  if(localizedName != NULL) {
+    free(localizedName);
+  }
   [enName release];
   [style release];
   [traits release];
