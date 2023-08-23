@@ -1,9 +1,9 @@
 let fontManager;
 try {
-  fontManager = require('./build/Release/fontmanager');
+  fontManager = require('./build/Release/fontmanager.node');
 } catch (releaseNotFoundError) {
   try {
-    fontManager = require('./build/Debug/fontmanager');
+    fontManager = require('./build/Debug/fontmanager.node');
   } catch (debugNotFoundError) {
     throw new Error('There is no built binary for font-manager');
   }
