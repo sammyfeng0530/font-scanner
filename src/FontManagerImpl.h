@@ -10,7 +10,7 @@ struct FontManagerImpl {
   FontManagerImpl (FontManagerImpl&&) = delete;
   FontManagerImpl& operator= (FontManagerImpl&&) = delete;
 
-  long getAvailableFonts(ResultSet **);
+  long getAvailableFonts(ResultSet **, bool needCache = false);
   long findFonts(ResultSet **, FontDescriptor *);
   long findFont(FontDescriptor **, FontDescriptor *);
   long substituteFont(FontDescriptor **, char *, char *);
